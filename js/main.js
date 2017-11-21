@@ -11,12 +11,18 @@ var db = [];
 $(document).ready(function ($) {
     getWexTrades();
     $('.js-update').on('click', function (e) {
-        getWexTrades();
+        //если кнопка была нажата но данные еще не обновиились запрещаем повторное нажатие
+        if (!$('.js-update').prop('disabled')) {
+            $('.js-update').prop('disabled', true);
+            getWexTrades().done(function () {
+                $('.js-update').prop('disabled', false);
+            });
+        }
     })
 });
 
 function getWexTrades() {
-    $.ajax({
+    return $.ajax({
         type: "GET",
         url: "https://wex.nz/api/3/trades/btc_usd",
         dataType: 'jsonp',
@@ -63,7 +69,13 @@ function setHumanDate(timestamp) {
 
 
 function newRender() {
-    for (var i = 0; i <= db.length; i++) {
-        $('tbody').append('<tr><td>' + db[i].amount + '</td><td>' + db[i].type + '</td><td>' + db[i].humanDate + '</td></tr>');
+    var tbody = '';
+    for (var i = 0; i < db.length; i++) {
+        tbody += renderRow(db[i]);
     }
+    $('tbody').append(tbody);
+}
+
+function renderRow(item) {
+    return '<tr><td>' + item.amount + '</td><td>' + item.type + '</td><td>' + item.humanDate + '</td></tr>'
 }
