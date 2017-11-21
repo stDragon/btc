@@ -1,3 +1,11 @@
+/**
+ * type: ask - продажа, bid - покупка.
+ * tprice: цена покупки/продажи.
+ * tamount: количество купленного/проданного.
+ * ttid: идентификатор сделки.
+ * ttimestamp: UNIX time сделки.
+ * */
+
 var db = [];
 
 $(document).ready(function ($) {
@@ -19,23 +27,27 @@ function getWexTrades() {
 
 function updateData(data) {
     var btcs = data.btc_usd;
-    btcs = _.sortBy(btcs, 'tid');
+    btcs = _.sortBy(btcs, 'tid'); //сортируем полученные данные по tid т.к. он уникальный
 
+    //если db уже заполнен (вторая и последующие загрузки) то фильтруем полученные данные
     if (db.length) {
+        //для этого в уже сохраненных данных находим максимальный tid
         var max = _.max(db, function (data) {
             return data.tid;
         });
+        //отфельтровываем полученные данные оставляя только те которые больше максимального
         btcs = _.filter(btcs, function (btc) {
             return btc.tid > max.tid;
         });
     }
 
-    btcs.forEach(updateHumanDate);
-    btcs = _.indexBy(btcs, 'tid');
-    btcs = _.toArray(btcs);
+    btcs.forEach(updateHumanDate); //добавляем человекопонятную дату
+    btcs = _.indexBy(btcs, 'tid'); //переделываем объект добавляя уникальный ключ из {name: 'moe', age: 40} в "40": {name: 'moe', age: 40} http://underscorejs.ru/#indexBy
+    btcs = _.toArray(btcs); // преврощаем объект в массив
+
 
     if (btcs.length) {
-        db = db.concat(btcs);
+        db = db.concat(btcs); //объединяем массивы
     }
 
     console.log(db);
