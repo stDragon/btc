@@ -64,7 +64,7 @@ function updateHumanDate(element, index, array) {
 }
 
 function setHumanDate(timestamp) {
-    return new Date(timestamp * 1000).toString();
+    return moment(timestamp * 1000).format('MM/DD/YYYY, HH:mm:ss');
 }
 
 
